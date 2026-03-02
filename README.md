@@ -1,56 +1,87 @@
-# 💰 Personal Finance Tracker API
+# Personal Finance Tracker API
 
-A RESTful API built with Python and FastAPI for tracking personal finances. This project demonstrates core backend engineering skills including REST API design, PostgreSQL database management, SQLAlchemy ORM, and Docker containerization.
+Backend API for a personal finance tracker built with FastAPI and SQLAlchemy.
 
----
+This repository is being used as a backend portfolio project focused on:
 
-## 🛠️ Tech Stack
+- REST API design
+- database modeling and migrations
+- user management
+- password hashing
+- test setup for CRUD logic
 
-- **Python** - Core language
-- **FastAPI** - Web framework
-- **PostgreSQL** - Database
-- **SQLAlchemy** - ORM (Object Relational Mapper)
-- **Alembic** - Database migrations
-- **Pydantic** - Data validation
-- **Docker & Docker Compose** - Containerization
+## Tech Stack
 
----
+- Python
+- FastAPI
+- PostgreSQL
+- SQLAlchemy
+- Alembic
+- Pydantic
+- Docker Compose
+- Passlib with bcrypt
+- Pytest
 
-## 📁 Project Structure
+## Current Scope
 
-```
+Implemented today:
+
+- user model and user CRUD flow
+- duplicate email protection on create
+- reusable 404 helper for missing users
+- password hashing utility in `src/auth/hashing.py`
+- tests for core CRUD behavior
+
+In progress:
+
+- login endpoint
+- JWT authentication
+- transactions, categories, budgets, and reports modules
+
+## Project Structure
+
+```text
 personal_fin_tracker/
-├── alembic/                  # Database migration files
-├── src/
-│   ├── auth/                 # User management
-│   │   ├── models.py         # SQLAlchemy models
-│   │   ├── schemas.py        # Pydantic schemas
-│   │   ├── crud.py           # Database operations
-│   │   └── router.py         # API endpoints
-│   ├── core/
-│   │   └── config.py         # App configuration (env variables)
-│   ├── db/
-│   │   └── database.py       # Database connection
-│   └── main.py               # Application entry point
-├── .env.example              # Environment variables template
-├── docker-compose.yml        # Docker configuration
-├── requirements.txt          # Python dependencies
-└── README.md
+|-- alembic/
+|-- src/
+|   |-- auth/
+|   |   |-- crud.py
+|   |   |-- hashing.py
+|   |   |-- models.py
+|   |   |-- router.py
+|   |   `-- schemas.py
+|   |-- budget/
+|   |-- categories/
+|   |-- core/
+|   |-- db/
+|   |-- reports/
+|   |-- transactions/
+|   `-- main.py
+|-- test/
+|-- .env.example
+|-- alembic.ini
+|-- docker-compose.yml
+`-- requirements.txt
 ```
 
----
+## API Endpoints
 
-## ⚙️ Prerequisites
+### Users
 
-Make sure you have the following installed:
+| Method | Endpoint | Description |
+| --- | --- | --- |
+| `POST` | `/users` | Create a user |
+| `GET` | `/users/{user_id}` | Get user by id |
+| `PUT` | `/users/{user_id}` | Update user |
+| `DELETE` | `/users/{user_id}` | Delete user |
 
-- [Python 3.10+](https://www.python.org/)
-- [Docker & Docker Compose](https://www.docker.com/)
-- [Git](https://git-scm.com/)
+### Planned
 
----
+| Method | Endpoint | Description |
+| --- | --- | --- |
+| `POST` | `/auth/login` | Authenticate user and return token |
 
-## 🚀 Getting Started
+## Local Setup
 
 ### 1. Clone the repository
 
@@ -59,17 +90,11 @@ git clone https://github.com/your-username/personal_fin_tracker.git
 cd personal_fin_tracker
 ```
 
-### 2. Create and activate virtual environment
+### 2. Create and activate a virtual environment
 
-```bash
-# Create virtual environment
-python -m venv venv
-
-# Activate (Windows)
-venv\Scripts\Activate.ps1
-
-# Activate (Mac/Linux)
-source venv/bin/activate
+```powershell
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
 ```
 
 ### 3. Install dependencies
@@ -80,120 +105,55 @@ pip install -r requirements.txt
 
 ### 4. Configure environment variables
 
-```bash
-# Copy the example file
-cp .env.example .env
+Create `.env` from `.env.example` and set your PostgreSQL values.
 
-# Edit .env with your values
-POSTGRES_USER=your_user
-POSTGRES_PASSWORD=your_password
-POSTGRES_DB=finance_tracker
-POSTGRES_HOST=localhost
-POSTGRES_PORT=5432
-```
-
-### 5. Start the database with Docker
+### 5. Start PostgreSQL
 
 ```bash
 docker-compose up -d
 ```
 
-### 6. Run database migrations
+### 6. Run migrations
 
 ```bash
 alembic upgrade head
 ```
 
-### 7. Start the API server
+### 7. Start the API
+
+```powershell
+$env:PYTHONPATH="src"
+uvicorn src.main:app --reload
+```
+
+Docs:
+
+- Swagger UI: `http://127.0.0.1:8000/docs`
+- ReDoc: `http://127.0.0.1:8000/redoc`
+
+## Example Request
 
 ```bash
-$env:PYTHONPATH="src"; uvicorn src.main:app --reload  # Windows
-PYTHONPATH=src uvicorn src.main:app --reload           # Mac/Linux
+curl -X POST "http://127.0.0.1:8000/users" ^
+  -H "Content-Type: application/json" ^
+  -d "{\"name\":\"John Doe\",\"email\":\"john@example.com\",\"password\":\"secret123\"}"
 ```
 
-The API will be available at `http://127.0.0.1:8000`
+## Notes
 
----
+- `passlib` is installed in the project's `.venv`, so the IDE/interpreter should point there.
+- Password hashing is already wired into user creation.
+- Authentication and token handling are the next backend milestone.
 
-## 📖 API Documentation
+## Roadmap
 
-FastAPI automatically generates interactive documentation. Once the server is running, visit:
+- add login endpoint
+- issue and validate JWT tokens
+- protect private routes
+- implement transactions CRUD
+- implement categories and budgets
+- expand test coverage
 
-- **Swagger UI**: `http://127.0.0.1:8000/docs`
-- **ReDoc**: `http://127.0.0.1:8000/redoc`
+## License
 
----
-
-## 🔗 API Endpoints
-
-### Users
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `POST` | `/users` | Create a new user |
-| `GET` | `/users/{user_id}` | Get user by ID |
-| `PUT` | `/users/{user_id}` | Update user details |
-| `DELETE` | `/users/{user_id}` | Delete a user |
-
-### Example Request — Create User
-
-```bash
-curl -X POST "http://127.0.0.1:8000/users" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "name": "John Doe",
-    "email": "john@example.com",
-    "password": "securepassword"
-  }'
-```
-
-### Example Response
-
-```json
-{
-  "id": 1,
-  "name": "John Doe",
-  "email": "john@example.com",
-  "enabled": true
-}
-```
-
-> ⚠️ Passwords are **never** returned in API responses.
-
----
-
-## 🗄️ Database Schema
-
-The database consists of 4 tables:
-
-- **users** - User accounts
-- **transactions** - Financial transactions
-- **categories** - Transaction categories
-- **budgets** - Budget tracking
-
----
-
-## 🔒 Security Notes
-
-- Passwords are stored as hashed values (never plain text)
-- The `.env` file is excluded from version control via `.gitignore`
-- Always use `.env.example` as a template — never commit real credentials
-
----
-
-## 📌 Status
-
-🚧 **In Progress** — Currently implementing:
-- [x] Database schema & migrations
-- [x] User CRUD endpoints
-- [ ] Password hashing
-- [ ] Authentication (JWT)
-- [ ] Transactions endpoints
-- [ ] Categories endpoints
-- [ ] Budgets endpoints
-
----
-
-## 📄 License
-
-MIT License
+MIT

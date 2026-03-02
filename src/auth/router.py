@@ -1,4 +1,4 @@
-from auth.crud import create_user,delete_user,update_user,get_user,get_user_by_email
+from auth.crud import create_user,delete_user,update_user,get_user,get_user_by_email,get_404
 from auth.schemas import UserCreate,UserResponse
 from sqlalchemy.orm import Session
 from fastapi import APIRouter, Depends,HTTPException
@@ -20,11 +20,12 @@ def post_router(user_data :UserCreate,db:Session=Depends(get_db)):
     
 @router.get("/users/{user_id}",response_model=UserResponse)
 def get_router(user_id:int,db:Session=Depends(get_db)):
-    get_r_user=get_user(db,user_id)
-    return get_r_user
+    user_get=get_404(db,user_id)    
+    return user_get
 
 @router.delete("/users/{user_id}",response_model=UserResponse)
 def delete_router(user_id:int,db:Session=Depends(get_db)):
+    user_get=get_404(db,user_id) 
     del_r_user=delete_user(db,user_id)
     return del_r_user
 
@@ -32,6 +33,7 @@ def delete_router(user_id:int,db:Session=Depends(get_db)):
 
 @router.put("/users/{user_id}",response_model=UserResponse)
 def update_router(user_data :UserCreate,user_id:int,db:Session=Depends(get_db)):
+    user_get=get_404(db,user_id) 
     upd_r_user=update_user(db,user_id,user_data)
     return upd_r_user
     
