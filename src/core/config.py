@@ -7,6 +7,7 @@ class Settings(BaseSettings):
     POSTGRES_DB: str
     POSTGRES_HOST: str
     POSTGRES_PORT: str
+    SECRET_KEY: str
     
     @computed_field
     @property

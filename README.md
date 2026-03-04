@@ -1,87 +1,58 @@
-# Personal Finance Tracker API
+# 💰 Personal Finance Tracker API
 
-Backend API for a personal finance tracker built with FastAPI and SQLAlchemy.
+A RESTful API built with Python and FastAPI for tracking personal finances. This project demonstrates core backend engineering skills including REST API design, PostgreSQL database management, SQLAlchemy ORM, and Docker containerization.
 
-This repository is being used as a backend portfolio project focused on:
+---
 
-- REST API design
-- database modeling and migrations
-- user management
-- password hashing
-- test setup for CRUD logic
+## 🛠️ Tech Stack
 
-## Tech Stack
+- **Python** - Core language
+- **FastAPI** - Web framework
+- **PostgreSQL** - Database
+- **SQLAlchemy** - ORM (Object Relational Mapper)
+- **Alembic** - Database migrations
+- **Pydantic** - Data validation
+- **Docker & Docker Compose** - Containerization
+- **passlib[bcrypt]** - Password hashing
 
-- Python
-- FastAPI
-- PostgreSQL
-- SQLAlchemy
-- Alembic
-- Pydantic
-- Docker Compose
-- Passlib with bcrypt
-- Pytest
+---
 
-## Current Scope
+## 📁 Project Structure
 
-Implemented today:
-
-- user model and user CRUD flow
-- duplicate email protection on create
-- reusable 404 helper for missing users
-- password hashing utility in `src/auth/hashing.py`
-- tests for core CRUD behavior
-
-In progress:
-
-- login endpoint
-- JWT authentication
-- transactions, categories, budgets, and reports modules
-
-## Project Structure
-
-```text
+```
 personal_fin_tracker/
-|-- alembic/
-|-- src/
-|   |-- auth/
-|   |   |-- crud.py
-|   |   |-- hashing.py
-|   |   |-- models.py
-|   |   |-- router.py
-|   |   `-- schemas.py
-|   |-- budget/
-|   |-- categories/
-|   |-- core/
-|   |-- db/
-|   |-- reports/
-|   |-- transactions/
-|   `-- main.py
-|-- test/
-|-- .env.example
-|-- alembic.ini
-|-- docker-compose.yml
-`-- requirements.txt
+├── alembic/                  # Database migration files
+├── src/
+│   ├── auth/                 # User management & authentication
+│   │   ├── models.py         # SQLAlchemy models
+│   │   ├── schemas.py        # Pydantic schemas
+│   │   ├── crud.py           # Database operations
+│   │   ├── router.py         # API endpoints
+│   │   └── hashing.py        # Password hashing utilities
+│   ├── core/
+│   │   └── config.py         # App configuration (env variables)
+│   ├── db/
+│   │   └── database.py       # Database connection
+│   └── main.py               # Application entry point
+├── .env.example              # Environment variables template
+├── docker-compose.yml        # Docker configuration
+├── requirements.txt          # Python dependencies
+└── README.md
 ```
 
-## API Endpoints
+---
 
-### Users
+## ⚙️ Prerequisites
 
-| Method | Endpoint | Description |
-| --- | --- | --- |
-| `POST` | `/users` | Create a user |
-| `GET` | `/users/{user_id}` | Get user by id |
-| `PUT` | `/users/{user_id}` | Update user |
-| `DELETE` | `/users/{user_id}` | Delete user |
+Make sure you have the following installed:
 
-### Planned
+- [Python 3.10+](https://www.python.org/)
+- [Docker & Docker Compose](https://www.docker.com/)
+- [Git](https://git-scm.com/)
 
-| Method | Endpoint | Description |
-| --- | --- | --- |
-| `POST` | `/auth/login` | Authenticate user and return token |
+---
 
-## Local Setup
+## 🚀 Getting Started
 
 ### 1. Clone the repository
 
@@ -90,11 +61,17 @@ git clone https://github.com/your-username/personal_fin_tracker.git
 cd personal_fin_tracker
 ```
 
-### 2. Create and activate a virtual environment
+### 2. Create and activate virtual environment
 
-```powershell
-python -m venv .venv
-.\.venv\Scripts\Activate.ps1
+```bash
+# Create virtual environment
+python -m venv venv
+
+# Activate (Windows)
+venv\Scripts\Activate.ps1
+
+# Activate (Mac/Linux)
+source venv/bin/activate
 ```
 
 ### 3. Install dependencies
@@ -105,55 +82,146 @@ pip install -r requirements.txt
 
 ### 4. Configure environment variables
 
-Create `.env` from `.env.example` and set your PostgreSQL values.
+```bash
+# Copy the example file
+cp .env.example .env
 
-### 5. Start PostgreSQL
+# Edit .env with your values
+POSTGRES_USER=your_user
+POSTGRES_PASSWORD=your_password
+POSTGRES_DB=finance_tracker
+POSTGRES_HOST=localhost
+POSTGRES_PORT=5432
+```
+
+### 5. Start the database with Docker
 
 ```bash
 docker-compose up -d
 ```
 
-### 6. Run migrations
+### 6. Run database migrations
 
 ```bash
 alembic upgrade head
 ```
 
-### 7. Start the API
-
-```powershell
-$env:PYTHONPATH="src"
-uvicorn src.main:app --reload
-```
-
-Docs:
-
-- Swagger UI: `http://127.0.0.1:8000/docs`
-- ReDoc: `http://127.0.0.1:8000/redoc`
-
-## Example Request
+### 7. Start the API server
 
 ```bash
-curl -X POST "http://127.0.0.1:8000/users" ^
-  -H "Content-Type: application/json" ^
-  -d "{\"name\":\"John Doe\",\"email\":\"john@example.com\",\"password\":\"secret123\"}"
+$env:PYTHONPATH="src"; uvicorn src.main:app --reload  # Windows
+PYTHONPATH=src uvicorn src.main:app --reload           # Mac/Linux
 ```
 
-## Notes
+The API will be available at `http://127.0.0.1:8000`
 
-- `passlib` is installed in the project's `.venv`, so the IDE/interpreter should point there.
-- Password hashing is already wired into user creation.
-- Authentication and token handling are the next backend milestone.
+---
 
-## Roadmap
+## 📖 API Documentation
 
-- add login endpoint
-- issue and validate JWT tokens
-- protect private routes
-- implement transactions CRUD
-- implement categories and budgets
-- expand test coverage
+FastAPI automatically generates interactive documentation. Once the server is running, visit:
 
-## License
+- **Swagger UI**: `http://127.0.0.1:8000/docs`
+- **ReDoc**: `http://127.0.0.1:8000/redoc`
 
-MIT
+---
+
+## 🔗 API Endpoints
+
+### Users
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `POST` | `/users` | Create a new user (register) |
+| `GET` | `/users/{user_id}` | Get user by ID |
+| `PUT` | `/users/{user_id}` | Update user details |
+| `DELETE` | `/users/{user_id}` | Delete a user |
+
+### Auth (in progress)
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `POST` | `/auth/login` | Login and receive JWT token |
+
+### Example Request — Create User
+
+```bash
+curl -X POST "http://127.0.0.1:8000/users" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "John Doe",
+    "email": "john@example.com",
+    "password": "securepassword"
+  }'
+```
+
+### Example Response
+
+```json
+{
+  "id": 1,
+  "name": "John Doe",
+  "email": "john@example.com",
+  "enabled": true
+}
+```
+
+> ⚠️ Passwords are **never** returned in API responses.
+
+---
+
+## 🗄️ Database Schema
+
+The database consists of 4 tables:
+
+- **users** - User accounts
+- **transactions** - Financial transactions
+- **categories** - Transaction categories
+- **budgets** - Budget tracking
+
+---
+
+## 🔒 Security Notes
+
+- Passwords are hashed with bcrypt via passlib (never stored as plain text)
+- The `.env` file is excluded from version control via `.gitignore`
+- Always use `.env.example` as a template — never commit real credentials
+- JWT tokens will be used for authentication (in progress)
+
+---
+
+## 📌 Status
+
+🚧 **In Progress** — Currently implementing:
+- [x] Database schema & migrations
+- [x] User CRUD endpoints with proper error handling (404 for missing users, 409 for duplicate email)
+- [x] Password hashing (bcrypt via passlib) — `src/auth/hashing.py`
+- [ ] Login endpoint (`POST /auth/login`) — **next step**
+- [ ] JWT token generation & verification
+- [ ] Protected endpoints (require valid JWT token)
+- [ ] Transactions endpoints
+- [ ] Categories endpoints
+- [ ] Budgets endpoints
+
+---
+
+## 🗺️ Current State (Session Notes)
+
+### Last session summary
+- Implemented `get_user_or_404` helper in `crud.py` — reusable 404 check for all endpoints that need a `user_id`
+- Fixed `db.refresh(user_up)` in `update_user`
+- Fixed field name `hashed_password` in `update_user`
+- Created `src/auth/hashing.py` with `hash_pass(password)` and `ver_pass(password, hashed)` using passlib/bcrypt
+- Updated `create_user` in `crud.py` to hash passwords before storing
+
+### Next session — start here
+1. Create `POST /auth/login` endpoint in `src/auth/router.py`
+2. Use `ver_pass()` from `hashing.py` to verify the password
+3. If valid → generate JWT token and return it
+4. Install `python-jose` for JWT support
+
+---
+
+## 📄 License
+
+MIT License

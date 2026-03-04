@@ -14,3 +14,7 @@ class UserResponse(UserBase):#schema for returning user data
     id:int
     enabled:bool
     model_config=ConfigDict(from_attributes=True)
+    
+class LoginRequest(BaseModel):
+    emali:str
+    password:str
