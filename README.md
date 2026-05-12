@@ -227,7 +227,7 @@ curl -X POST "http://127.0.0.1:8000/users" \
 | User CRUD + error handling | ✅ Complete |
 | Password hashing | ✅ Complete |
 | JWT infrastructure | ✅ Complete |
-| POST /auth/login endpoint | ⚠️ Returns 401 (debugging pending) |✅ Complete|
+| POST /auth/login endpoint | ✅ Complete |
 | pytest infrastructure + first test | ✅ Complete |
 | Transactions CRUD + routing | 🔲 Pending |
 | Categories CRUD + routing | 🔲 Pending |
