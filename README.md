@@ -95,7 +95,7 @@ transactions                    budgets
 ### Auth
 | Method | Endpoint | Description | Status |
 |--------|----------|-------------|--------|
-| POST | `/auth/login` | Login, returns JWT token | ⚠️ debugging |
+| POST | `/auth/login` | Login, returns JWT token | ✅ |
 
 ### Transactions / Categories / Budgets
 > 🔲 Models exist — CRUD and routing pending
