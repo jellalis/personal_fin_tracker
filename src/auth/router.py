@@ -45,7 +45,7 @@ def login(user_data :LoginRequest,db:Session=Depends(get_db)):
     try:
         user_by_email=get_user_by_email(db,user_data.email)
         try:
-            ok_pass=ver_pass(user_by_email.hashed_password,user_data.password)
+            ok_pass=ver_pass(user_data.password,user_by_email.hashed_password)
             if ok_pass:
                 token_created=create_tok(user_by_email.id)
                 return {"access_token": token_created, "token_type": "bearer"}
