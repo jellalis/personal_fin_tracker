@@ -23,13 +23,13 @@ def update_user(db:Session,user_id: int, user_data: UserCreate):
     db.refresh(user_up)
     return user_up
 def delete_user(db:Session,user_id: int):
-    user_del=get_user(db,user_id)
+    user_del=get_user_or_404(db,user_id)
     db.delete(user_del)
     db.commit()
 def get_user_by_email(db:Session,email:str):
     user=db.query(User).filter(User.email==email).first()
     return user
-def get_404(db:Session ,user_id: int ):
+def get_user_or_404(db:Session ,user_id: int ):
     user=get_user(db,user_id)
     if not user:
         raise HTTPException(status_code=404, detail="no user with this id")    
