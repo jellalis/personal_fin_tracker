@@ -35,8 +35,11 @@ personal_fin_tracker/
 │   │   └── jwt.py                # JWT token creation & verification: create_tok(), verify_tok()
 │   ├── transactions/             # Transactions module (models only)
 │   │   └── models.py
-│   ├── categories/               # Categories module (models only)
-│   │   └── models.py
+│   ├── categories/               # Categories module (schemas, models, crud implemented)
+│   │   ├── models.py             # Category model — user_id nullable (NULL = default category)
+│   │   ├── schemas.py            # CategoryBase, CategoryCreate, CategoryResponse
+│   │   └── crud.py               # create_category, get_categories, get_category,
+│   │                             # delete_category, get_categ_or_404
 │   ├── budget/                   # Budget module (models only)
 │   │   └── models.py
 │   ├── reports/                  # Reports module (planned)
@@ -63,8 +66,9 @@ personal_fin_tracker/
 users                           categories
 ├── id (PK)                     ├── id (PK)
 ├── name                        ├── name
-├── email (unique)              └── user_id (FK → users)
-└── hashed_password
+├── email (unique)              └── user_id (FK → users, nullable)
+└── hashed_password                  NULL = default category (visible to all users)
+                                     integer = custom category (visible to owner only)
 
 transactions                    budgets
 ├── id (PK)                     ├── id (PK)
@@ -78,7 +82,8 @@ transactions                    budgets
 **Design decisions:**
 - One-to-many relationships throughout (user → transactions, user → categories, user → budgets)
 - One-to-many chosen over many-to-many for categories intentionally — avoids overengineering
-- Each user owns their own categories privately
+- `user_id = NULL` on a category means it is a system default visible to all users
+- Each user sees their own custom categories plus all default categories
 
 ---
 
@@ -97,7 +102,15 @@ transactions                    budgets
 |--------|----------|-------------|--------|
 | POST | `/auth/login` | Login, returns JWT token | ✅ |
 
-### Transactions / Categories / Budgets
+### Categories
+| Method | Endpoint | Description | Status |
+|--------|----------|-------------|--------|
+| POST | `/categories` | Create custom category | 🔲 |
+| GET | `/categories` | Get all categories (defaults + own) | 🔲 |
+| GET | `/categories/{category_id}` | Get category by ID | 🔲 |
+| DELETE | `/categories/{category_id}` | Delete custom category | 🔲 |
+
+### Transactions / Budgets
 > 🔲 Models exist — CRUD and routing pending
 
 ---
@@ -229,8 +242,9 @@ curl -X POST "http://127.0.0.1:8000/users" \
 | JWT infrastructure | ✅ Complete |
 | POST /auth/login endpoint | ✅ Complete |
 | pytest infrastructure + first test | ✅ Complete |
+| Categories schemas + model + CRUD | ✅ Complete |
+| Categories router + seeding defaults | 🔲 Pending |
 | Transactions CRUD + routing | 🔲 Pending |
-| Categories CRUD + routing | 🔲 Pending |
 | Budgets CRUD + routing | 🔲 Pending |
 | Protected routes (auth middleware) | 🔲 Pending |
 | Expanded test coverage | 🔲 Pending |
