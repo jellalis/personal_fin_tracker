@@ -32,30 +32,29 @@ personal_fin_tracker/
 │   │   ├── crud.py               # User CRUD operations + get_user_or_404 helper
 │   │   ├── router.py             # User & auth endpoints
 │   │   ├── hashing.py            # Password hashing: hash_pass(), ver_pass()
-│   │   └── jwt.py                # JWT token creation & verification: create_tok(), verify_tok()
+│   │   └── jwt.py                # JWT token creation & verification + oauth2_scheme
 │   ├── transactions/             # Transactions module (models only)
-│   │   └── models.py
-│   ├── categories/               # Categories module (schemas, models, crud implemented)
+│   ├── categories/               # Categories module (fully implemented)
 │   │   ├── models.py             # Category model — user_id nullable (NULL = default category)
 │   │   ├── schemas.py            # CategoryBase, CategoryCreate, CategoryResponse
-│   │   └── crud.py               # create_category, get_categories, get_category,
-│   │                             # delete_category, get_categ_or_404
+│   │   ├── crud.py               # CRUD operations + get_categ_or_404 helper
+│   │   └── router.py             # Category endpoints (JWT protected)
 │   ├── budget/                   # Budget module (models only)
-│   │   └── models.py
 │   ├── reports/                  # Reports module (planned)
 │   ├── core/
-│   │   └── config.py             # App configuration via pydantic-settings (reads .env)
+│   │   └── config.py             # App configuration via pydantic-settings
 │   └── db/
 │       └── database.py           # SQLAlchemy engine, SessionLocal, Base, get_db()
+├── scripts/
+│   └── seed_categories.py        # Seeds default categories into the database
 ├── tests/
-│   ├── conftest.py               # pytest fixtures: session-scoped engine, function-scoped db session with rollback
-│   └── test_crud.py              # Unit tests for user CRUD
+│   ├── conftest.py               # pytest fixtures
+│   └── test_crud.py              # Unit tests
 ├── alembic/                      # Database migration files
-├── alembic.ini
-├── docker-compose.yml            # PostgreSQL service
+├── docker-compose.yml
 ├── requirements.txt
 ├── .env                          # Secret keys — gitignored
-└── .env.example                  # Template for environment variables
+└── .env.example
 ```
 
 ---
@@ -67,8 +66,8 @@ users                           categories
 ├── id (PK)                     ├── id (PK)
 ├── name                        ├── name
 ├── email (unique)              └── user_id (FK → users, nullable)
-└── hashed_password                  NULL = default category (visible to all users)
-                                     integer = custom category (visible to owner only)
+└── hashed_password                  NULL = default (visible to all users)
+                                     integer = custom (visible to owner only)
 
 transactions                    budgets
 ├── id (PK)                     ├── id (PK)
@@ -79,36 +78,30 @@ transactions                    budgets
 └── category_id (FK → categories)
 ```
 
-**Design decisions:**
-- One-to-many relationships throughout (user → transactions, user → categories, user → budgets)
-- One-to-many chosen over many-to-many for categories intentionally — avoids overengineering
-- `user_id = NULL` on a category means it is a system default visible to all users
-- Each user sees their own custom categories plus all default categories
-
 ---
 
 ## 🔌 API Endpoints
 
-### Users
-| Method | Endpoint | Description | Status |
-|--------|----------|-------------|--------|
-| POST | `/users` | Register new user | ✅ |
-| GET | `/users/{user_id}` | Get user by ID | ✅ |
-| PUT | `/users/{user_id}` | Update user | ✅ |
-| DELETE | `/users/{user_id}` | Delete user | ✅ |
-
 ### Auth
-| Method | Endpoint | Description | Status |
-|--------|----------|-------------|--------|
-| POST | `/auth/login` | Login, returns JWT token | ✅ |
+| Method | Endpoint | Description | Auth | Status |
+|--------|----------|-------------|------|--------|
+| POST | `/auth/login` | Login, returns JWT token | ❌ | ✅ |
+
+### Users
+| Method | Endpoint | Description | Auth | Status |
+|--------|----------|-------------|------|--------|
+| POST | `/users` | Register new user | ❌ | ✅ |
+| GET | `/users/{user_id}` | Get user by ID | ❌ | ✅ |
+| PUT | `/users/{user_id}` | Update user | ❌ | ✅ |
+| DELETE | `/users/{user_id}` | Delete user | ❌ | ✅ |
 
 ### Categories
-| Method | Endpoint | Description | Status |
-|--------|----------|-------------|--------|
-| POST | `/categories` | Create custom category | 🔲 |
-| GET | `/categories` | Get all categories (defaults + own) | 🔲 |
-| GET | `/categories/{category_id}` | Get category by ID | 🔲 |
-| DELETE | `/categories/{category_id}` | Delete custom category | 🔲 |
+| Method | Endpoint | Description | Auth | Status |
+|--------|----------|-------------|------|--------|
+| POST | `/categories` | Create custom category | ✅ | ✅ |
+| GET | `/categories` | Get all categories (defaults + own) | ✅ | ✅ |
+| GET | `/categories/{category_id}` | Get category by ID | ✅ | ✅ |
+| DELETE | `/categories/{category_id}` | Delete custom category | ✅ | ✅ |
 
 ### Transactions / Budgets
 > 🔲 Models exist — CRUD and routing pending
@@ -174,10 +167,24 @@ docker-compose up -d
 ### 6. Run database migrations
 
 ```bash
-alembic upgrade head
+# Windows
+$env:PYTHONPATH="src"; alembic upgrade head
+
+# Mac/Linux
+PYTHONPATH=src alembic upgrade head
 ```
 
-### 7. Start the API server
+### 7. Seed default categories
+
+```bash
+# Windows
+$env:PYTHONPATH="src"; python scripts/seed_categories.py
+
+# Mac/Linux
+PYTHONPATH=src python scripts/seed_categories.py
+```
+
+### 8. Start the API server
 
 ```bash
 # Windows
@@ -200,30 +207,11 @@ pytest
 
 ---
 
-## 📖 Example Request — Create User
-
-```bash
-curl -X POST "http://127.0.0.1:8000/users" \
-  -H "Content-Type: application/json" \
-  -d '{"name": "John Doe", "email": "john@example.com", "password": "securepassword"}'
-```
-
-```json
-{
-  "id": 1,
-  "name": "John Doe",
-  "email": "john@example.com"
-}
-```
-
-> ⚠️ Passwords are **never** returned in API responses.
-
----
-
 ## 🔒 Security Notes
 
 - Passwords hashed with bcrypt via passlib (never stored as plain text)
 - Identical 401 responses for wrong password and user not found — prevents email enumeration
+- JWT tokens required for all category endpoints
 - `.env` excluded from version control via `.gitignore`
 - `bcrypt==4.0.1` pinned — passlib incompatible with bcrypt 5.x
 
@@ -236,14 +224,12 @@ curl -X POST "http://127.0.0.1:8000/users" \
 | Project structure & Docker | ✅ Complete |
 | SQLAlchemy models (all 4 tables) | ✅ Complete |
 | Alembic migrations | ✅ Complete |
-| Pydantic schemas | ✅ Complete |
 | User CRUD + error handling | ✅ Complete |
 | Password hashing | ✅ Complete |
 | JWT infrastructure | ✅ Complete |
 | POST /auth/login endpoint | ✅ Complete |
 | pytest infrastructure + first test | ✅ Complete |
-| Categories schemas + model + CRUD | ✅ Complete |
-| Categories router + seeding defaults | 🔲 Pending |
+| Categories CRUD + routing + seeding | ✅ Complete |
 | Transactions CRUD + routing | 🔲 Pending |
 | Budgets CRUD + routing | 🔲 Pending |
 | Protected routes (auth middleware) | 🔲 Pending |
