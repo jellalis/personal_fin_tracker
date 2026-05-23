@@ -7,4 +7,4 @@ class CategoryCreate(CategoryBase):
 class CategoryResponse(CategoryBase):
     model_config=ConfigDict(from_attributes=True)
     id:int    
-    user_id:int
+    user_id: int | None = None
