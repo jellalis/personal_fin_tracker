@@ -48,7 +48,7 @@ personal_fin_tracker/
 ├── scripts/
 │   └── seed_categories.py        # Seeds default categories into the database
 ├── tests/
-│   ├── conftest.py               # pytest fixtures
+│   ├── conftest.py               # pytest fixtures (SQLite in-memory, rollback isolation)
 │   └── test_crud.py              # Unit tests
 ├── alembic/                      # Database migration files
 ├── docker-compose.yml
@@ -66,8 +66,8 @@ users                           categories
 ├── id (PK)                     ├── id (PK)
 ├── name                        ├── name
 ├── email (unique)              └── user_id (FK → users, nullable)
-└── hashed_password                  NULL = default (visible to all users)
-                                     integer = custom (visible to owner only)
+├── hashed_password                  NULL = default (visible to all users)
+└── enabled                          integer = custom (visible to owner only)
 
 transactions                    budgets
 ├── id (PK)                     ├── id (PK)
@@ -83,25 +83,25 @@ transactions                    budgets
 ## 🔌 API Endpoints
 
 ### Auth
-| Method | Endpoint | Description | Auth | Status |
-|--------|----------|-------------|------|--------|
-| POST | `/auth/login` | Login, returns JWT token | ❌ | ✅ |
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| POST | `/auth/login` | Login — returns JWT token | ❌ |
 
 ### Users
-| Method | Endpoint | Description | Auth | Status |
-|--------|----------|-------------|------|--------|
-| POST | `/users` | Register new user | ❌ | ✅ |
-| GET | `/users/{user_id}` | Get user by ID | ❌ | ✅ |
-| PUT | `/users/{user_id}` | Update user | ❌ | ✅ |
-| DELETE | `/users/{user_id}` | Delete user | ❌ | ✅ |
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| POST | `/auth/users` | Register new user | ❌ |
+| GET | `/auth/users/{user_id}` | Get user by ID | ❌ |
+| PUT | `/auth/users/{user_id}` | Update user | ❌ |
+| DELETE | `/auth/users/{user_id}` | Delete user | ❌ |
 
 ### Categories
-| Method | Endpoint | Description | Auth | Status |
-|--------|----------|-------------|------|--------|
-| POST | `/categories` | Create custom category | ✅ | ✅ |
-| GET | `/categories` | Get all categories (defaults + own) | ✅ | ✅ |
-| GET | `/categories/{category_id}` | Get category by ID | ✅ | ✅ |
-| DELETE | `/categories/{category_id}` | Delete custom category | ✅ | ✅ |
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| POST | `/categories` | Create custom category | ✅ JWT |
+| GET | `/categories` | Get all categories (defaults + own) | ✅ JWT |
+| GET | `/categories/{category_id}` | Get category by ID | ✅ JWT |
+| DELETE | `/categories/{category_id}` | Delete custom category | ✅ JWT |
 
 ### Transactions / Budgets
 > 🔲 Models exist — CRUD and routing pending
@@ -154,8 +154,6 @@ POSTGRES_DB=finance_tracker
 POSTGRES_HOST=localhost
 POSTGRES_PORT=5432
 SECRET_KEY=your-secret-key
-ALGORITHM=HS256
-ACCESS_TOKEN_EXPIRE_MINUTES=30
 ```
 
 ### 5. Start the database
@@ -205,12 +203,14 @@ Swagger UI: `http://127.0.0.1:8000/docs`
 pytest
 ```
 
+Tests use an SQLite in-memory database — no Docker needed to run the test suite.
+
 ---
 
 ## 🔒 Security Notes
 
-- Passwords hashed with bcrypt via passlib (never stored as plain text)
-- Identical 401 responses for wrong password and user not found — prevents email enumeration
+- Passwords hashed with bcrypt via passlib — never stored as plain text
+- Identical 401 responses for wrong password and unknown email — prevents email enumeration
 - JWT tokens required for all category endpoints
 - `.env` excluded from version control via `.gitignore`
 - `bcrypt==4.0.1` pinned — passlib incompatible with bcrypt 5.x
@@ -230,9 +230,11 @@ pytest
 | POST /auth/login endpoint | ✅ Complete |
 | pytest infrastructure + first test | ✅ Complete |
 | Categories CRUD + routing + seeding | ✅ Complete |
+| Code comments (all files documented) | ✅ Complete |
 | Transactions CRUD + routing | 🔲 Pending |
 | Budgets CRUD + routing | 🔲 Pending |
-| Protected routes (auth middleware) | 🔲 Pending |
+| Ownership checks on category endpoints | 🔲 Pending |
+| JWT protection on user endpoints | 🔲 Pending |
 | Expanded test coverage | 🔲 Pending |
 
 ---
