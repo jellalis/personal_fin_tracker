@@ -47,9 +47,9 @@ personal_fin_tracker/
 │       └── database.py           # SQLAlchemy engine, SessionLocal, Base, get_db()
 ├── scripts/
 │   └── seed_categories.py        # Seeds default categories into the database
-├── tests/
-│   ├── conftest.py               # pytest fixtures (SQLite in-memory, rollback isolation)
-│   └── test_crud.py              # Unit tests
+├── test/
+│   ├── conftest.py               # pytest fixtures (SQLite in-memory, full isolation per test)
+│   └── test_crud.py              # Unit tests: create_user, get_user_not_found, delete_user
 ├── alembic/                      # Database migration files
 ├── docker-compose.yml
 ├── requirements.txt
@@ -228,14 +228,14 @@ Tests use an SQLite in-memory database — no Docker needed to run the test suit
 | Password hashing | ✅ Complete |
 | JWT infrastructure | ✅ Complete |
 | POST /auth/login endpoint | ✅ Complete |
-| pytest infrastructure + first test | ✅ Complete |
+| pytest infrastructure + unit tests (3 passing) | ✅ Complete |
 | Categories CRUD + routing + seeding | ✅ Complete |
 | Code comments (all files documented) | ✅ Complete |
 | Transactions CRUD + routing | 🔲 Pending |
 | Budgets CRUD + routing | 🔲 Pending |
 | Ownership checks on category endpoints | 🔲 Pending |
 | JWT protection on user endpoints | 🔲 Pending |
-| Expanded test coverage | 🔲 Pending |
+| Expanded test coverage (duplicate email, update, category, auth tests) | 🔲 Pending |
 
 ---
 
