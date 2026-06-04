@@ -33,8 +33,10 @@ def get_category(db:Session,category_id):
 def delete_category(db:Session,category_id: int):
     category_del=get_categ_or_404(db,category_id)
     db.delete(category_del)
+    db.flush()
+    db.expunge(category_del)
     db.commit()
-
+    return category_del
 # check if category is available — reusable 404 helper (same pattern as get_user_or_404 in auth)
 def get_categ_or_404(db:Session,category_id:int):
     category=get_category(db,category_id)

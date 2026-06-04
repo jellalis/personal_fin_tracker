@@ -5,6 +5,7 @@
 from auth.router import router as auth_router
 from fastapi import FastAPI
 from categories.router import router as categories_router
+from transactions.router import router as transactions_router
 
 # The main app instance — FastAPI creates the HTTP server, Swagger docs, and handles all routing
 app = FastAPI()
@@ -16,3 +17,4 @@ app.include_router(auth_router, prefix="/auth")
 
 # categories has no prefix, so its routes are at root level (e.g. /categories, /categories/{id})
 app.include_router(categories_router)
+app.include_router(transactions_router)

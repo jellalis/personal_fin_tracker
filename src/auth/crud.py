@@ -30,7 +30,9 @@ def update_user(db:Session,user_id: int, user_data: UserCreate):
 
 def delete_user(db:Session,user_id: int):
     user_del=get_user_or_404(db,user_id)
-    db.delete(user_del)  
+    db.delete(user_del) 
+    db.flush()
+    db.expunge(user_del)
     db.commit() 
     return user_del
 
