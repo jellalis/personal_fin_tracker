@@ -33,7 +33,11 @@ personal_fin_tracker/
 │   │   ├── router.py             # User & auth endpoints
 │   │   ├── hashing.py            # Password hashing: hash_pass(), ver_pass()
 │   │   └── jwt.py                # JWT token creation & verification + oauth2_scheme
-│   ├── transactions/             # Transactions module (models only)
+│   ├── transactions/             # Transactions module (fully implemented)
+│   │   ├── models.py             # Transaction SQLAlchemy model (Enum type, timezone-aware created_at)
+│   │   ├── schemas.py            # TransactionBase, TransactionCreate, TransactionResponse, TransactionType
+│   │   ├── crud.py               # Transaction CRUD + get_transaction_or_404 helper (ownership enforced)
+│   │   └── router.py             # Transaction endpoints (JWT protected)
 │   ├── categories/               # Categories module (fully implemented)
 │   │   ├── models.py             # Category model — user_id nullable (NULL = default category)
 │   │   ├── schemas.py            # CategoryBase, CategoryCreate, CategoryResponse
@@ -71,10 +75,12 @@ users                           categories
 
 transactions                    budgets
 ├── id (PK)                     ├── id (PK)
-├── amount                      ├── amount
-├── description                 ├── month
-├── date                        ├── user_id (FK → users)
-├── user_id (FK → users)        └── category_id (FK → categories)
+├── amount                      ├── name
+├── type (income/expense)       ├── amount
+├── description (nullable)      ├── month
+├── transaction_date            ├── user_id (FK → users)
+├── created_at (timezone-aware) └── category_id (FK → categories)
+├── user_id (FK → users)
 └── category_id (FK → categories)
 ```
 
@@ -103,8 +109,16 @@ transactions                    budgets
 | GET | `/categories/{category_id}` | Get category by ID | ✅ JWT |
 | DELETE | `/categories/{category_id}` | Delete custom category | ✅ JWT |
 
-### Transactions / Budgets
-> 🔲 Models exist — CRUD and routing pending
+### Transactions
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| POST | `/transactions` | Create new transaction | ✅ JWT |
+| GET | `/transactions` | Get all transactions for logged-in user | ✅ JWT |
+| GET | `/transactions/{transaction_id}` | Get transaction by ID (ownership enforced) | ✅ JWT |
+| DELETE | `/transactions/{transaction_id}` | Delete transaction (ownership enforced) | ✅ JWT |
+
+### Budgets
+> 🔲 Model exists — CRUD and routing pending
 
 ---
 
@@ -231,7 +245,7 @@ Tests use an SQLite in-memory database — no Docker needed to run the test suit
 | pytest infrastructure + unit tests (3 passing) | ✅ Complete |
 | Categories CRUD + routing + seeding | ✅ Complete |
 | Code comments (all files documented) | ✅ Complete |
-| Transactions CRUD + routing | 🔲 Pending |
+| Transactions CRUD + routing | ✅ Complete |
 | Budgets CRUD + routing | 🔲 Pending |
 | Ownership checks on category endpoints | 🔲 Pending |
 | JWT protection on user endpoints | 🔲 Pending |

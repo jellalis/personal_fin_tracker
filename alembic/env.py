@@ -4,12 +4,12 @@ from logging.config import fileConfig
 from sqlalchemy import pool
 from sqlalchemy import pool, create_engine
 from alembic import context
-from src.core.config import settings
-from src.db.database import Base
-import src.auth.models
-import src.transactions.models
-import src.categories.models
-import src.budget.models
+from core.config import settings
+from db.database import Base
+import auth.models
+import transactions.models
+import categories.models
+import budget.models
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
