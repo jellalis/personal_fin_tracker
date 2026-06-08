@@ -4,7 +4,9 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 from db.database import Base
 from auth.models import User
-
+from budget.models import Budget
+from categories.models import Category
+from transactions.models import Transaction
 
 TEST_DATABASE_URL = "sqlite://"
 

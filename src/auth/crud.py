@@ -7,7 +7,12 @@ from auth.hashing import hash_pass
 def create_user(db: Session , user_data : UserCreate):
     # hash_pass() converts the plain password to a bcrypt hash before storing
     # We pass the hash to the model, never the raw password
+    if get_user_by_email(db,user_data.email):
+        raise HTTPException(status_code=409, detail="A user with this email already exists")
+    
     new_user=User(name=user_data.name,email=user_data.email,hashed_password=hash_pass(user_data.password))  # creation of user with schemas infos
+    
+            
     db.add(new_user)     # stages the new user for insertion (not written to DB yet)
     db.commit()          # flushes the staged change and writes it to the database
     db.refresh(new_user) # re-reads the row from DB so new_user now has the auto-generated id

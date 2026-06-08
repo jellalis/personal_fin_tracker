@@ -15,12 +15,9 @@ router=APIRouter()
 # Depends(get_db) injects a database session automatically — we never create one manually in routes
 @router.post("/users",response_model=UserResponse)
 def post_router(user_data :UserCreate,db:Session=Depends(get_db)):
-    
-    if get_user_by_email(db,user_data.email):
-        raise HTTPException(status_code=409, detail="there is also a same email")
-    else :
+        
         post_r_user=create_user(db,user_data)
-    return post_r_user
+        return post_r_user
 
 
 # GET /auth/users/{user_id} — fetch a single user by their id
