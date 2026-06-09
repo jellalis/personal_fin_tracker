@@ -52,8 +52,8 @@ personal_fin_tracker/
 ├── scripts/
 │   └── seed_categories.py        # Seeds default categories into the database
 ├── test/
-│   ├── conftest.py               # pytest fixtures (SQLite in-memory, full isolation per test)
-│   └── test_crud.py              # Unit tests: create_user, get_user_not_found, delete_user
+│   ├── conftest.py               # pytest fixtures (SQLite in-memory + StaticPool, full isolation per test)
+│   └── test_auth.py              # Auth unit tests: 6 passing
 ├── alembic/                      # Database migration files
 ├── docker-compose.yml
 ├── requirements.txt
@@ -132,7 +132,7 @@ transactions                    budgets
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/your-username/personal_fin_tracker.git
+git clone https://github.com/jellalis/personal_fin_tracker.git
 cd personal_fin_tracker
 ```
 
@@ -214,7 +214,11 @@ Swagger UI: `http://127.0.0.1:8000/docs`
 ### Run Tests
 
 ```bash
-pytest
+# Windows
+$env:PYTHONPATH="src"; pytest test/ -v
+
+# Mac/Linux
+PYTHONPATH=src pytest test/ -v
 ```
 
 Tests use an SQLite in-memory database — no Docker needed to run the test suite.
@@ -225,9 +229,10 @@ Tests use an SQLite in-memory database — no Docker needed to run the test suit
 
 - Passwords hashed with bcrypt via passlib — never stored as plain text
 - Identical 401 responses for wrong password and unknown email — prevents email enumeration
-- JWT tokens required for all category endpoints
+- JWT tokens required for all category and transaction endpoints
 - `.env` excluded from version control via `.gitignore`
 - `bcrypt==4.0.1` pinned — passlib incompatible with bcrypt 5.x
+- Duplicate email check enforced at CRUD layer — returns 409 Conflict
 
 ---
 
@@ -242,14 +247,14 @@ Tests use an SQLite in-memory database — no Docker needed to run the test suit
 | Password hashing | ✅ Complete |
 | JWT infrastructure | ✅ Complete |
 | POST /auth/login endpoint | ✅ Complete |
-| pytest infrastructure + unit tests (3 passing) | ✅ Complete |
+| pytest infrastructure + 6 passing tests | ✅ Complete |
 | Categories CRUD + routing + seeding | ✅ Complete |
 | Code comments (all files documented) | ✅ Complete |
 | Transactions CRUD + routing | ✅ Complete |
 | Budgets CRUD + routing | 🔲 Pending |
 | Ownership checks on category endpoints | 🔲 Pending |
 | JWT protection on user endpoints | 🔲 Pending |
-| Expanded test coverage (duplicate email, update, category, auth tests) | 🔲 Pending |
+| Expanded test coverage (categories, transactions, auth flow) | 🔲 In Progress |
 
 ---
 
