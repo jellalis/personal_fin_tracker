@@ -12,7 +12,7 @@ router=APIRouter()
 
 # POST /categories — create a new category owned by the logged-in user
 # All three dependencies (db, token) are injected by FastAPI automatically via Depends()
-@router.post("/categories",response_model=CategoryResponse)
+@router.post("/categories",response_model=CategoryResponse,status_code=201)
 def post_router(category_data:CategoryCreate,db:Session=Depends(get_db),token: str=Depends(oauth2_scheme)):
     payload = verify_tok(token)    # decode and validate the JWT — raises 401 if invalid or expired
     user_id = int(payload["sub"])  # "sub" is always a string in JWT standard — convert to int for the DB

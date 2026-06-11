@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta,timezone
 from jose import jwt
 from core.config import settings
 from fastapi import HTTPException
@@ -11,7 +11,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
 def create_tok(user_id:int) -> str:
     # Token expires 30 minutes from now — a balance between security (short) and convenience (not too short)
-    time_exp=datetime.utcnow()+timedelta(minutes=30)
+    time_exp = datetime.now(timezone.utc) + timedelta(minutes=30)
 
     # The JWT payload (also called "claims") — data we embed inside the signed token
     # "sub" (subject) is the standard JWT field for identifying the user — must be a string
