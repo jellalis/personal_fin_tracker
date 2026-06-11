@@ -4,6 +4,7 @@ from auth.crud import create_user,get_user_or_404,delete_user,update_user
 from auth.schemas import UserCreate
 from auth.hashing import ver_pass
 
+
 def test_create_user(db):
     
     user_data=UserCreate(
@@ -81,3 +82,4 @@ def test_update_user(db):
     assert new_user_data.name==updated_user.name
     assert new_user_data.email==updated_user.email
     assert ver_pass("Panos",updated_user.hashed_password)
+    

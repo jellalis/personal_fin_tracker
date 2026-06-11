@@ -13,7 +13,7 @@ router=APIRouter()
 # POST /auth/users — register a new user
 # response_model=UserResponse controls what fields are returned (hides the password field)
 # Depends(get_db) injects a database session automatically — we never create one manually in routes
-@router.post("/users",response_model=UserResponse)
+@router.post("/users",response_model=UserResponse,status_code=201)
 def post_router(user_data :UserCreate,db:Session=Depends(get_db)):
         
         post_r_user=create_user(db,user_data)
