@@ -1,6 +1,24 @@
 # 💰 Personal Finance Tracker API
 
-A RESTful API built with Python and FastAPI for tracking personal finances. Built as a portfolio project to demonstrate core backend engineering skills: REST API design, PostgreSQL database management, SQLAlchemy ORM, JWT authentication, and Docker containerization.
+Most people don't know where their money goes. Spreadsheets are cumbersome, and
+off-the-shelf apps lock your data behind subscriptions with no programmatic access.
+
+This is a production-ready REST API for personal finance management — track income
+and expenses, organise them into categories, and own your data completely.
+Built with FastAPI and PostgreSQL, with JWT authentication, full test coverage, and CI/CD.
+
+> 🔗 **Live API:** `coming soon`
+> 📖 **Interactive Docs (Swagger):** `coming soon`
+
+---
+
+## ✨ Features
+
+- **JWT Authentication** — secure register/login flow with bcrypt password hashing
+- **Transaction Tracking** — log income and expenses with type, amount, date, and category
+- **Category Management** — system-wide default categories + personal custom ones per user
+- **Ownership Enforcement** — users can only access their own data (IDOR protection)
+- **Dockerised** — runs locally with a single `docker-compose up`
 
 ---
 
@@ -26,25 +44,23 @@ A RESTful API built with Python and FastAPI for tracking personal finances. Buil
 personal_fin_tracker/
 ├── src/
 │   ├── main.py                   # FastAPI app entry point, router registration
-│   ├── auth/                     # Authentication & user management (fully implemented)
+│   ├── auth/                     # Authentication & user management
 │   │   ├── models.py             # User SQLAlchemy model
 │   │   ├── schemas.py            # Pydantic schemas: UserBase, UserCreate, UserResponse, LoginRequest
 │   │   ├── crud.py               # User CRUD operations + get_user_or_404 helper
 │   │   ├── router.py             # User & auth endpoints
 │   │   ├── hashing.py            # Password hashing: hash_pass(), ver_pass()
 │   │   └── jwt.py                # JWT token creation & verification + oauth2_scheme
-│   ├── transactions/             # Transactions module (fully implemented)
+│   ├── transactions/             # Transactions module
 │   │   ├── models.py             # Transaction SQLAlchemy model (Enum type, timezone-aware created_at)
 │   │   ├── schemas.py            # TransactionBase, TransactionCreate, TransactionResponse, TransactionType
-│   │   ├── crud.py               # Transaction CRUD + get_transaction_or_404 helper (ownership enforced)
+│   │   ├── crud.py               # Transaction CRUD + get_transaction_or_404 (ownership enforced)
 │   │   └── router.py             # Transaction endpoints (JWT protected)
-│   ├── categories/               # Categories module (fully implemented)
+│   ├── categories/               # Categories module
 │   │   ├── models.py             # Category model — user_id nullable (NULL = default category)
 │   │   ├── schemas.py            # CategoryBase, CategoryCreate, CategoryResponse
 │   │   ├── crud.py               # CRUD operations + get_categ_or_404 helper
 │   │   └── router.py             # Category endpoints (JWT protected)
-│   ├── budget/                   # Budget module (models only)
-│   ├── reports/                  # Reports module (planned)
 │   ├── core/
 │   │   └── config.py             # App configuration via pydantic-settings
 │   └── db/
@@ -52,12 +68,11 @@ personal_fin_tracker/
 ├── scripts/
 │   └── seed_categories.py        # Seeds default categories into the database
 ├── test/
-│   ├── conftest.py               # pytest fixtures (SQLite in-memory + StaticPool, full isolation per test)
-│   └── test_auth.py              # Auth unit tests: 6 passing
+│   ├── conftest.py               # pytest fixtures (SQLite in-memory + StaticPool)
+│   └── test_auth.py              # Auth tests
 ├── alembic/                      # Database migration files
 ├── docker-compose.yml
 ├── requirements.txt
-├── .env                          # Secret keys — gitignored
 └── .env.example
 ```
 
@@ -117,8 +132,17 @@ transactions                    budgets
 | GET | `/transactions/{transaction_id}` | Get transaction by ID (ownership enforced) | ✅ JWT |
 | DELETE | `/transactions/{transaction_id}` | Delete transaction (ownership enforced) | ✅ JWT |
 
-### Budgets
-> 🔲 Model exists — CRUD and routing pending
+---
+
+## 🧠 Key Design Decisions
+
+| Decision | Why |
+|----------|-----|
+| 404 instead of 403 on ownership checks | Returning 403 confirms the resource exists — an attacker can enumerate IDs. 404 reveals nothing. |
+| Validation logic in CRUD, not routers | Routers handle HTTP concerns; business logic belongs in the service layer. Easier to test and reuse. |
+| `bcrypt==4.0.1` pinned | passlib is incompatible with bcrypt 5.x — silent auth failures in production without this pin. |
+| `DateTime(timezone=True)` on `created_at` | Timezone-naive datetimes cause subtle bugs when servers or users are in different timezones. |
+| SQLite in tests, PostgreSQL in production | Tests run without Docker (faster CI); StaticPool forces in-memory SQLite to reuse one connection so setup tables stay visible. |
 
 ---
 
@@ -206,7 +230,7 @@ $env:PYTHONPATH="src"; uvicorn src.main:app --reload
 PYTHONPATH=src uvicorn src.main:app --reload
 ```
 
-API: `http://127.0.0.1:8000`  
+API: `http://127.0.0.1:8000`
 Swagger UI: `http://127.0.0.1:8000/docs`
 
 ---
@@ -247,14 +271,13 @@ Tests use an SQLite in-memory database — no Docker needed to run the test suit
 | Password hashing | ✅ Complete |
 | JWT infrastructure | ✅ Complete |
 | POST /auth/login endpoint | ✅ Complete |
-| pytest infrastructure + 6 passing tests | ✅ Complete |
+| pytest infrastructure + auth tests | ✅ Complete |
 | Categories CRUD + routing + seeding | ✅ Complete |
-| Code comments (all files documented) | ✅ Complete |
 | Transactions CRUD + routing | ✅ Complete |
-| Budgets CRUD + routing | 🔲 Pending |
-| Ownership checks on category endpoints | 🔲 Pending |
-| JWT protection on user endpoints | 🔲 Pending |
-| Expanded test coverage (categories, transactions, auth flow) | 🔲 In Progress |
+| Expanded test coverage | 🔄 In Progress |
+| CI/CD (GitHub Actions) | 🔲 Planned |
+| Live deployment | 🔲 Planned |
+| Budgets CRUD + routing | 🔲 Planned |
 
 ---
 
