@@ -43,18 +43,18 @@ def update_router(user_data :UserCreate,user_id:int,db:Session=Depends(get_db)):
 # It uses 'username' as the field name (OAuth2 standard), even though our app uses email addresses
 @router.post("/login")
 def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
-    try:
+    
         user_by_email = get_user_by_email(db, form_data.username)  # ← username αντί για email (OAuth2 standard)
-        try:
-            ok_pass = ver_pass(form_data.password, user_by_email.hashed_password)
-            if ok_pass:
-                token_created = create_tok(user_by_email.id)
+        # Security decision: return identical 401 for wrong password AND user not found
+        # Giving different errors would allow attackers to enumerate valid email addresses 
+        if not user_by_email:
+            raise HTTPException(status_code=401, detail="wrong detail")
+        ok_pass = ver_pass(form_data.password, user_by_email.hashed_password)
+        if not ok_pass:
+            raise HTTPException(status_code=401, detail="wrong detail")
+        token_created = create_tok(user_by_email.id)
                 # token_type "bearer" tells clients how to send the token:
                 # Authorization: Bearer <token>
-                return {"access_token": token_created, "token_type": "bearer"}
-        except:
-            # Security decision: return identical 401 for wrong password AND user not found
-            # Giving different errors would allow attackers to enumerate valid email addresses
-            raise HTTPException(status_code=401, detail="wrong details")
-    except:
-        raise HTTPException(status_code=401, detail="wrong details")
+        return {"access_token": token_created, "token_type": "bearer"}
+            
+
