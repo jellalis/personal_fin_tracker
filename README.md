@@ -112,9 +112,9 @@ transactions                    budgets
 | Method | Endpoint | Description | Auth Required |
 |--------|----------|-------------|---------------|
 | POST | `/auth/users` | Register new user | ❌ |
-| GET | `/auth/users/{user_id}` | Get user by ID | ❌ |
-| PUT | `/auth/users/{user_id}` | Update user | ❌ |
-| DELETE | `/auth/users/{user_id}` | Delete user | ❌ |
+| GET | `/auth/users/me` | Get current user profile | ✅ JWT |
+| PUT | `/auth/users/me` | Update current user | ✅ JWT |
+| DELETE | `/auth/users/me` | Delete current user | ✅ JWT |
 
 ### Categories
 | Method | Endpoint | Description | Auth Required |
@@ -253,7 +253,7 @@ Tests use an SQLite in-memory database — no Docker needed to run the test suit
 
 - Passwords hashed with bcrypt via passlib — never stored as plain text
 - Identical 401 responses for wrong password and unknown email — prevents email enumeration
-- JWT tokens required for all category and transaction endpoints
+- JWT tokens required for all user, category, and transaction endpoints (except `/auth/register` and `/auth/login`)
 - `.env` excluded from version control via `.gitignore`
 - `bcrypt==4.0.1` pinned — passlib incompatible with bcrypt 5.x
 - Duplicate email check enforced at CRUD layer — returns 409 Conflict
