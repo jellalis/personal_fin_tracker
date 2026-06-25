@@ -25,6 +25,9 @@ def get_user(db:Session, user_id :int):
 
 def update_user(db:Session,user_id: int, user_data: UserCreate):
     user_up=get_user_or_404(db,user_id)
+    existing_user=get_user_by_email(db,user_data.email)
+    if existing_user != user_up and existing_user is not None:
+        raise HTTPException(status_code=409, detail="A user with this email already exists")
 
     user_up.name=user_data.name
     user_up.email=user_data.email
@@ -50,6 +53,6 @@ def get_user_or_404(db:Session ,user_id: int ):
     # Reusable helper: fetches a user OR raises HTTP 404 if they don't exist
     # Use this in routes instead of get_user() to avoid repeating the same if-not-user check everywhere
     user=get_user(db,user_id)
-    if not user:
+    if not user :
         raise HTTPException(status_code=404, detail="no user with this id")
     return user
