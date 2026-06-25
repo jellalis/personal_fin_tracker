@@ -5,15 +5,24 @@ from fastapi import HTTPException
 from categories.crud import get_categ_or_404
 #create transaction
 
-def create_transaction(db:Session,user_id:int,transaction_data:TransactionCreate):
-    get_categ_or_404(db,transaction_data.category_id)
-    new_transaction=Transaction(user_id=user_id,category_id=transaction_data.category_id,amount=transaction_data.amount,type=transaction_data.type,
-                                transaction_date=transaction_data.transaction_date,description=transaction_data.description)
+def create_transaction(db: Session, user_id: int, transaction_data: TransactionCreate):
+    # verify category exists
+    category = get_categ_or_404(db, transaction_data.category_id)
+    # Security: only allow own categories or default (NULL) categories
+    # Prevents User B from linking transactions to User A's private categories
+    if category.user_id != user_id and category.user_id is not None:
+        raise HTTPException(status_code=404, detail="no category with this id")
+    new_transaction = Transaction(
+        user_id=user_id,
+        category_id=transaction_data.category_id,
+        amount=transaction_data.amount,
+        type=transaction_data.type,
+        transaction_date=transaction_data.transaction_date,
+        description=transaction_data.description
+    )
     db.add(new_transaction)
     db.commit()
     db.refresh(new_transaction)
-    
-        
     return new_transaction
 
 def get_transactions(db:Session,user_id:int):
