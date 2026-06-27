@@ -72,7 +72,10 @@ personal_fin_tracker/
 │   └── test_auth.py              # Auth tests
 ├── alembic/                      # Database migration files
 ├── docker-compose.yml
-├── requirements.txt
+├── Dockerfile
+├── .dockerignore
+├── requirements.txt              # Production dependencies
+├── requirements-dev.txt          # Dev/test dependencies (includes requirements.txt)
 └── .env.example
 ```
 
@@ -175,7 +178,11 @@ source venv/bin/activate
 ### 3. Install dependencies
 
 ```bash
+# Production only
 pip install -r requirements.txt
+
+# Development + testing (includes production deps)
+pip install -r requirements-dev.txt
 ```
 
 ### 4. Configure environment variables
