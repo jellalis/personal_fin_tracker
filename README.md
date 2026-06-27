@@ -260,7 +260,7 @@ Tests use an SQLite in-memory database — no Docker needed to run the test suit
 
 - Passwords hashed with bcrypt via passlib — never stored as plain text
 - Identical 401 responses for wrong password and unknown email — prevents email enumeration
-- JWT tokens required for all user, category, and transaction endpoints (except `/auth/register` and `/auth/login`)
+- JWT tokens required for all user, category, and transaction endpoints (except `POST /auth/users` and `POST /auth/login`)
 - `.env` excluded from version control via `.gitignore`
 - `bcrypt==4.0.1` pinned — passlib incompatible with bcrypt 5.x
 - Duplicate email check enforced at CRUD layer — returns 409 Conflict
