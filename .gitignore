@@ -4,6 +4,8 @@ venv/
 __pycache__/
 *.pyc
 .vscode/
+.pytest_cache/
+.claude/
 CLAUDE.md
 resources_study/
 ROADMAP.md
