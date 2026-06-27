@@ -7,8 +7,8 @@ This is a production-ready REST API for personal finance management — track in
 and expenses, organise them into categories, and own your data completely.
 Built with FastAPI and PostgreSQL, with JWT authentication, full test coverage, and CI/CD.
 
-> 🔗 **Live API:** `coming soon`
-> 📖 **Interactive Docs (Swagger):** `coming soon`
+> 🔗 **Live API:** https://personal-fin-tracker-elq3.onrender.com
+> 📖 **Interactive Docs (Swagger):** https://personal-fin-tracker-elq3.onrender.com/docs
 
 ---
 
@@ -283,7 +283,7 @@ Tests use an SQLite in-memory database — no Docker needed to run the test suit
 | Transactions CRUD + routing | ✅ Complete |
 | Expanded test coverage | 🔄 In Progress |
 | CI/CD (GitHub Actions) | 🔲 Planned |
-| Live deployment | 🔲 Planned |
+| Live deployment (Render + Neon) | ✅ Complete |
 | Budgets CRUD + routing | 🔲 Planned |
 
 ---
