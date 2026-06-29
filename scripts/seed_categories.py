@@ -10,8 +10,9 @@ import auth.models  # ← importing this registers the 'users' table with SQLAlc
                     # Required because Category has a ForeignKey to users.id — SQLAlchemy
                     # needs to know about the users table before it can insert into categories
 
-# The 6 default categories — user_id will be NULL, so they are visible to all users
-default_cat=["food","supermarket","gifts","subscriptions","bills","entertainment "]
+# Default categories — match the frontend Category type exactly so the mapping works
+# Frontend expects: food, transport, shopping, entertainment, bills, salary, other
+default_cat = ["food", "transport", "shopping", "entertainment", "bills", "salary", "other"]
 
 # Open a database session manually (no FastAPI here, so we don't use get_db())
 db = SessionLocal()

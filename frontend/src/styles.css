@@ -1,0 +1,153 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+
+  --color-background:         var(--background);
+  --color-foreground:         var(--foreground);
+  --color-card:               var(--card);
+  --color-card-foreground:    var(--card-foreground);
+  --color-primary:            var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-muted:              var(--muted);
+  --color-muted-foreground:   var(--muted-foreground);
+  --color-destructive:        var(--destructive);
+  --color-border:             var(--border);
+  --color-input:              var(--input);
+  --color-ring:               var(--ring);
+
+  --color-toad:  var(--toad);
+  --color-leaf:  var(--leaf);
+  --color-ink:   var(--ink);
+  --color-scroll: var(--scroll);
+  --color-ember: var(--ember);
+  --color-gold:  var(--gold);
+
+  --font-display: "Yuji Syuku", "Zen Kurenaido", serif;
+  --font-sans:    "Zen Kurenaido", system-ui, sans-serif;
+}
+
+:root {
+  --radius: 0.75rem;
+
+  /* washi scroll paper */
+  --background:      oklch(0.945 0.025 75);
+  --foreground:      oklch(0.22  0.03  50);
+  --card:            oklch(0.975 0.018 80);
+  --card-foreground: oklch(0.22  0.03  50);
+
+  /* hokage orange */
+  --primary:            oklch(0.7  0.19 45);
+  --primary-foreground: oklch(0.99 0.01 80);
+
+  --muted:            oklch(0.91 0.02 75);
+  --muted-foreground: oklch(0.42 0.04 55);
+
+  --destructive:            oklch(0.55 0.22 28);
+  --destructive-foreground: oklch(0.99 0    0);
+
+  --border: oklch(0.25 0.03 50);
+  --input:  oklch(0.9  0.02 75);
+  --ring:   oklch(0.7  0.19 45);
+
+  --toad:   oklch(0.7  0.19  45);   /* gama orange */
+  --leaf:   oklch(0.55 0.13 145);   /* konoha green */
+  --ink:    oklch(0.22 0.03  50);   /* sumi ink */
+  --scroll: oklch(0.93 0.04  80);   /* washi cream */
+  --ember:  oklch(0.6  0.22  30);   /* nine-tails red */
+  --gold:   oklch(0.82 0.14  90);   /* ryo coin gold */
+
+  --gradient-hero:   linear-gradient(135deg, oklch(0.72 0.18 45) 0%, oklch(0.62 0.22 30) 100%);
+  --gradient-scroll: linear-gradient(180deg, oklch(0.95 0.03 80) 0%, oklch(0.9  0.05 75) 100%);
+  --gradient-ember:  linear-gradient(135deg, oklch(0.7  0.19 45),   oklch(0.55 0.22 28));
+
+  --shadow-scroll: 0 6px 24px -10px oklch(0.22 0.03 50 / 0.35);
+  --shadow-stamp:  4px 4px 0 0      oklch(0.22 0.03 50);
+}
+
+.dark {
+  --background:      oklch(0.18 0.02 45);
+  --foreground:      oklch(0.95 0.02 80);
+  --card:            oklch(0.22 0.03 45);
+  --card-foreground: oklch(0.95 0.02 80);
+  --primary:            oklch(0.72 0.2  45);
+  --primary-foreground: oklch(0.15 0.02 45);
+  --muted:            oklch(0.28 0.03 45);
+  --muted-foreground: oklch(0.72 0.04 70);
+  --destructive:      oklch(0.6  0.22 28);
+  --border:           oklch(0.4  0.04 45);
+  --input:            oklch(0.32 0.04 45);
+  --ring:             oklch(0.72 0.2  45);
+}
+
+@layer base {
+  * { border-color: var(--color-border); }
+  html, body { font-family: var(--font-sans); }
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    background-image:
+      radial-gradient(circle at 85% 12%, oklch(0.6 0.22 30 / 0.18), transparent 35%),
+      radial-gradient(circle at 12% 88%, oklch(0.55 0.13 145 / 0.12), transparent 40%),
+      repeating-linear-gradient(0deg,  oklch(0.22 0.03 50 / 0.02) 0 1px, transparent 1px 3px),
+      repeating-linear-gradient(90deg, oklch(0.22 0.03 50 / 0.02) 0 1px, transparent 1px 3px);
+    background-attachment: fixed;
+  }
+  h1, h2, h3, .font-display {
+    font-family: var(--font-display);
+    letter-spacing: 0;
+    font-weight: 400;
+  }
+}
+
+/* scroll-paper card */
+@utility scroll-card {
+  background: var(--gradient-scroll);
+  border: 2px solid var(--color-ink);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-scroll);
+  position: relative;
+}
+
+/* hard-stamp element */
+@utility stamp {
+  border: 2px solid var(--color-ink);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-stamp);
+  transition: transform 120ms ease, box-shadow 120ms ease;
+}
+
+@utility stamp-hover {
+  &:hover  { transform: translate(-2px, -2px); box-shadow: 6px 6px 0 0 var(--color-ink); }
+  &:active { transform: translate( 2px,  2px); box-shadow: 0   0   0 0 var(--color-ink); }
+}
+
+/* red hanko / chop seal */
+@utility hanko {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-ember);
+  color: oklch(0.98 0.02 80);
+  border: 2px solid oklch(0.35 0.1 28);
+  border-radius: 4px;
+  font-family: var(--font-display);
+  transform: rotate(-4deg);
+}
+
+@keyframes float-slow {
+  0%, 100% { transform: translateY(0)    rotate(-2deg); }
+  50%       { transform: translateY(-10px) rotate( 2deg); }
+}
+
+@keyframes coin-spin {
+  0%, 100% { opacity: 0.4; transform: translateY(0)   rotate(0deg);   }
+  50%       { opacity: 1;   transform: translateY(-6px) rotate(180deg); }
+}
+
+@utility animate-float { animation: float-slow 4s ease-in-out infinite; }
+@utility animate-coin  { animation: coin-spin  2.8s ease-in-out infinite; }
