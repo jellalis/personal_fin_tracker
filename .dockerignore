@@ -1,0 +1,28 @@
+# Git history
+.git
+.gitignore
+
+# Python cache files
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environment — τα dependencies εγκαθίστανται από requirements.txt
+venv
+.venv
+
+# Environment variables — ΠΟΤΕ μέσα στο container
+.env
+
+# Tests — δεν χρειάζονται σε production
+test/
+
+# IDE files
+.vscode
+.idea
+
+# Local docs
+*.md
+CLAUDE.md
+ROADMAP.md

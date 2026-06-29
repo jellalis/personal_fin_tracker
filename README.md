@@ -7,8 +7,8 @@ This is a production-ready REST API for personal finance management — track in
 and expenses, organise them into categories, and own your data completely.
 Built with FastAPI and PostgreSQL, with JWT authentication, full test coverage, and CI/CD.
 
-> 🔗 **Live API:** `coming soon`
-> 📖 **Interactive Docs (Swagger):** `coming soon`
+> 🔗 **Live API:** https://personal-fin-tracker-elq3.onrender.com
+> 📖 **Interactive Docs (Swagger):** https://personal-fin-tracker-elq3.onrender.com/docs
 
 ---
 
@@ -72,7 +72,10 @@ personal_fin_tracker/
 │   └── test_auth.py              # Auth tests
 ├── alembic/                      # Database migration files
 ├── docker-compose.yml
-├── requirements.txt
+├── Dockerfile
+├── .dockerignore
+├── requirements.txt              # Production dependencies
+├── requirements-dev.txt          # Dev/test dependencies (includes requirements.txt)
 └── .env.example
 ```
 
@@ -112,9 +115,9 @@ transactions                    budgets
 | Method | Endpoint | Description | Auth Required |
 |--------|----------|-------------|---------------|
 | POST | `/auth/users` | Register new user | ❌ |
-| GET | `/auth/users/{user_id}` | Get user by ID | ❌ |
-| PUT | `/auth/users/{user_id}` | Update user | ❌ |
-| DELETE | `/auth/users/{user_id}` | Delete user | ❌ |
+| GET | `/auth/users/me` | Get current user profile | ✅ JWT |
+| PUT | `/auth/users/me` | Update current user | ✅ JWT |
+| DELETE | `/auth/users/me` | Delete current user | ✅ JWT |
 
 ### Categories
 | Method | Endpoint | Description | Auth Required |
@@ -175,7 +178,11 @@ source venv/bin/activate
 ### 3. Install dependencies
 
 ```bash
+# Production only
 pip install -r requirements.txt
+
+# Development + testing (includes production deps)
+pip install -r requirements-dev.txt
 ```
 
 ### 4. Configure environment variables
@@ -253,7 +260,7 @@ Tests use an SQLite in-memory database — no Docker needed to run the test suit
 
 - Passwords hashed with bcrypt via passlib — never stored as plain text
 - Identical 401 responses for wrong password and unknown email — prevents email enumeration
-- JWT tokens required for all category and transaction endpoints
+- JWT tokens required for all user, category, and transaction endpoints (except `POST /auth/users` and `POST /auth/login`)
 - `.env` excluded from version control via `.gitignore`
 - `bcrypt==4.0.1` pinned — passlib incompatible with bcrypt 5.x
 - Duplicate email check enforced at CRUD layer — returns 409 Conflict
@@ -276,7 +283,7 @@ Tests use an SQLite in-memory database — no Docker needed to run the test suit
 | Transactions CRUD + routing | ✅ Complete |
 | Expanded test coverage | 🔄 In Progress |
 | CI/CD (GitHub Actions) | 🔲 Planned |
-| Live deployment | 🔲 Planned |
+| Live deployment (Render + Neon) | ✅ Complete |
 | Budgets CRUD + routing | 🔲 Planned |
 
 ---

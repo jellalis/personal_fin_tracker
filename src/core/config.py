@@ -13,18 +13,19 @@ class Settings(BaseSettings):
     POSTGRES_HOST: str
     POSTGRES_PORT: str
     SECRET_KEY: str
-    # Optional SSL mode — not set locally, set to "require" on Neon/Render
+    # Optional SSL mode — not set locally, set to "require" on Render/Neon
     POSTGRES_SSLMODE: Optional[str] = None
 
     # @computed_field builds a derived field from existing ones — it is NOT read from .env
     # DATABASE_URL assembles the full connection string that SQLAlchemy's create_engine() needs
+    # Appends ?sslmode=require when POSTGRES_SSLMODE is set — required for Neon and cloud providers
     @computed_field
     @property
     def DATABASE_URL(self) -> str:
-        base = f"postgresql://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@{self.POSTGRES_HOST}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
+        base_url = f"postgresql://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@{self.POSTGRES_HOST}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
         if self.POSTGRES_SSLMODE:
-            return f"{base}?sslmode={self.POSTGRES_SSLMODE}"
-        return base
+            return f"{base_url}?sslmode={self.POSTGRES_SSLMODE}"
+        return base_url
 
     # Tells pydantic-settings to look for a .env file in the project root directory
     model_config = {"env_file": ".env"}
