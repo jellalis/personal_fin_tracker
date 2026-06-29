@@ -30,11 +30,10 @@ def get_category(db: Session, category_id):
 # delete category — ownership enforced: only the owner can delete their own categories
 # Default categories (user_id=None) are protected — they never match any user_id
 def delete_category(db: Session, category_id: int, user_id: int):
-    category_del = get_categ_or_404(db, category_id)
+    category_del = get_categ_or_404(db, category_id,user_id)
     # Security: 404 instead of 403 — prevents resource enumeration
-    # Also protects default categories (user_id=None) — None != any user_id
-    if category_del.user_id != user_id:
-        raise HTTPException(status_code=404, detail="no category with this id")
+    # ownership enforced via get_categ_or_404 — raises 404 if not owner or default category
+    
     db.delete(category_del)
     db.flush()
     db.expunge(category_del)
@@ -42,8 +41,11 @@ def delete_category(db: Session, category_id: int, user_id: int):
     return category_del
 
 # reusable 404 helper — raises 404 if category doesn't exist (same pattern as get_user_or_404)
-def get_categ_or_404(db: Session, category_id: int):
+def get_categ_or_404(db: Session, category_id: int, user_id: int):
     category = get_category(db, category_id)
+    
     if not category:
+        raise HTTPException(status_code=404, detail="no category with this id")
+    if category.user_id != user_id and category.user_id is not None :
         raise HTTPException(status_code=404, detail="no category with this id")
     return category

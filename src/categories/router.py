@@ -32,7 +32,8 @@ def get_routers(db: Session = Depends(get_db), token: str = Depends(oauth2_schem
 def get_router(category_id: int, db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
     payload = verify_tok(token)
     user_id = int(payload["sub"])
-    category = get_categ_or_404(db, category_id)
+    
+    category = get_categ_or_404(db, category_id,user_id)
     return category
 
 # DELETE /categories/{category_id} — delete a category owned by the logged-in user
